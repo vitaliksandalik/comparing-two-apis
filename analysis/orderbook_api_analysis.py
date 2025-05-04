@@ -115,37 +115,19 @@ class OrderBookAPIAnalysis:
             "recv_time": "2024-11-28 12:25:01.414389"
         }
 
-        old_api_ask_bytes = len(json.dumps(old_api_ask))
-        old_api_bid_bytes = len(json.dumps(old_api_bid))
-        old_api_total_bytes = old_api_ask_bytes + old_api_bid_bytes
-
         old_api_message_bytes = len(json.dumps(old_api_container))
-
-        new_api_entry_bytes = len(json.dumps(new_api_entry))
         new_api_message_bytes = len(json.dumps(new_api_container))
 
-        entry_size_reduction = (
-            1 - new_api_entry_bytes / old_api_total_bytes) * 100
         message_size_reduction = (
             1 - new_api_message_bytes / old_api_message_bytes) * 100
 
         raw_data_df = pd.DataFrame({
             'Metric': [
-                'Old API: Single Ask Entry Size (bytes)',
-                'Old API: Single Bid Entry Size (bytes)',
-                'Old API: Total (Ask + Bid) (bytes)',
-                'New API: Single Combined Entry (bytes)',
-                'Entry Size Reduction (%)',
                 'Old API: Full Message Size (bytes)',
                 'New API: Full Message Size (bytes)',
                 'Full Message Size Reduction (%)',
             ],
             'Value': [
-                old_api_ask_bytes,
-                old_api_bid_bytes,
-                old_api_total_bytes,
-                new_api_entry_bytes,
-                f"{entry_size_reduction:.2f}%",
                 old_api_message_bytes,
                 new_api_message_bytes,
                 f"{message_size_reduction:.2f}%",
@@ -153,11 +135,6 @@ class OrderBookAPIAnalysis:
         })
 
         plot_data = [
-            {'Category': 'Entry Size',
-                'API': 'Old API (Ask + Bid)', 'Bytes': old_api_total_bytes},
-            {'Category': 'Entry Size',
-                'API': 'New API (Combined)', 'Bytes': new_api_entry_bytes},
-
             {'Category': 'Message Size', 'API': 'Old API',
                 'Bytes': old_api_message_bytes},
             {'Category': 'Message Size', 'API': 'New API',
@@ -166,9 +143,7 @@ class OrderBookAPIAnalysis:
 
         plot_df = pd.DataFrame(plot_data)
 
-        plot_df.attrs['entry_size_reduction'] = f"{entry_size_reduction:.2f}%"
         plot_df.attrs['message_size_reduction'] = f"{message_size_reduction:.2f}%"
-
         plot_df.attrs['raw_data'] = raw_data_df
 
         return plot_df
@@ -277,27 +252,23 @@ class OrderBookAPIAnalysis:
     def _plot_byte_size_comparison(self, save_path='reports/orderbook_byte_size_comparison.png') -> None:
         plot_df = self._compare_byte_size()
 
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(10, 6))
 
         ax = sns.barplot(x='Category', y='Bytes', hue='API', data=plot_df)
 
         for container in ax.containers:
             ax.bar_label(container)
 
-        plt.title('Orderbook Byte Size Comparison')
+        plt.title('Orderbook Message Size Comparison')
         plt.ylabel('Size in Bytes')
         plt.grid(True, linestyle='--', alpha=0.7, axis='y')
 
-        entry_reduction = plot_df.attrs['entry_size_reduction']
         message_reduction = plot_df.attrs['message_size_reduction']
 
-        plt.annotate(f"Reduction: {entry_reduction}",
-                     xy=(0, 0), xytext=(0.18, 0.90), textcoords='figure fraction',
-                     fontsize=10, fontweight='bold')
-
         plt.annotate(f"Reduction: {message_reduction}",
-                     xy=(0, 0), xytext=(0.68, 0.90), textcoords='figure fraction',
-                     fontsize=10, fontweight='bold')
+                     xy=(0, 0), xytext=(0.5, 0.90), textcoords='figure fraction',
+                     fontsize=10, fontweight='bold', 
+                     ha='center')
 
         plt.tight_layout()
         plt.savefig(save_path)
@@ -309,12 +280,7 @@ class OrderBookAPIAnalysis:
 
         raw_data = byte_size_df.attrs['raw_data']
 
-        print("Entry Size Comparison:")
-        print(f"  Old API (Ask + Bid): {raw_data.loc[2, 'Value']} bytes")
-        print(f"  New API (Combined): {raw_data.loc[3, 'Value']} bytes")
-        print(f"  Reduction: {raw_data.loc[4, 'Value']}")
-
-        print("\nFull Message Size Comparison:")
-        print(f"  Old API: {raw_data.loc[5, 'Value']} bytes")
-        print(f"  New API: {raw_data.loc[6, 'Value']} bytes")
-        print(f"  Reduction: {raw_data.loc[7, 'Value']}")
+        print("Full Message Size Comparison:")
+        print(f"  Old API: {raw_data.loc[0, 'Value']} bytes")
+        print(f"  New API: {raw_data.loc[1, 'Value']} bytes")
+        print(f"  Reduction: {raw_data.loc[2, 'Value']}")

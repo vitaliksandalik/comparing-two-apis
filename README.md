@@ -2,32 +2,18 @@
 
 ## What is the difference between two APIs?
 
-1. **Structure and Format**:
+1. **Structure, message size and Format**:
 
-   - Old API uses verbose field names (`type`, `orderType`, `quantity`, etc.) New API uses compact names (ty, ap, bp, etc.) for faster data transmission, economise resources, and reduce latency.
+   - Old API uses verbose field names (`type`, `orderType`, `quantity`, etc.) New API uses compact names (ty, ap, bp, etc.) for faster data transmission, economise resources, and reduce latency
    - New API uses Milliseconds, Old API - Microseconds
-   - Old API stores bids and asks as separate records. New API combines them as pairs at each price level, reducing payload size, message count, parsing/merge work, lowers memory cost.
-   - New API provides totals (`tas`, `tbs`).
+   - Old API stores bids and asks as separate records. New API combines them as pairs at each price level, reducing payload size, message count, parsing/merge work, lowers memory cost
+   - New API provides totals (`tas`, `tbs`)
 
 |                  | Old API                                  | New API                                                                                  |
 | ---------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Field Names      | Verbose (`orderType`, `quantity`, etc.)  | Compact (`ap`, `bp`, `as`, `bs`, etc.). Giving up a bit of readability to reduce latency |
 | Timestamp Format | Microseconds (string)                    | Milliseconds (integer, faster for computing)                                             |
 | Data Strucutre   | Stores bids and asks as separate records | bid + ask pairs at each price level                                                      |
-
-2. **Message Size, Byte-Level Comparison**:
-
-here for Old API I merged ask + bid in one message, for the comparison to be fair
-
-- Full single messages are 29.14% smaller (231 bytes vs 326 bytes)
-- Bid + Ask entries are 68.69% smaller (198 bytes vs 62 bytes)
-
-| Comparison                  | Old API | New API | Reduction |
-| --------------------------- | ------- | ------- | --------- |
-| Bid + Ask entries (bytes)   | 198     | 62      | 68.69%    |
-| Full single message (bytes) | 326     | 231     | 29.14%    |
-
-The New API achieves these reductions through optimisation made in point 1
 
 ## Which API has better latency and why?
 
@@ -61,6 +47,64 @@ However, the new API does show higher variance (std dev 37.67ms vs 13.04ms) and 
 
    - Compare message sizes and consistency
    - Analyse byte-level structure differences
+
+The comparison below aims to see how many raw bytes each API needs to transmit one full depth level (ask + bid).
+So, to keep the comparison fair, the Old API example below contains two objects, while the New API example contains one (already has ask + bid in it).
+
+```json
+// Old API
+{
+  "type": "orderbookdepth",
+  "content": {
+    "datetime": "1732796700879952",
+    "list": [
+      {
+        "total": "1",
+        "orderType": "ask",
+        "quantity": "0.0387",
+        "price": "133331000",
+        "symbol": "ABC_USD"
+      },
+      {
+        "total": "2",
+        "orderType": "bid",
+        "quantity": "0.9006",
+        "price": "133281000",
+        "symbol": "ABC_USD"
+      }
+    ]
+  },
+  "recv_time": "2024-11-28 12:25:01.071989"
+}
+```
+
+```json
+// New API
+{
+  "ty": "orderbook",
+  "cd": "USD-ABC",
+  "tas": 0.2823,
+  "tbs": 1.1529,
+  "obu": [
+    {
+      "ap": 133331000,
+      "bp": 133281000,
+      "as": 0.0387,
+      "bs": 0.9006
+    }
+  ],
+  "lv": 1,
+  "tms": 1732796701204,
+  "st": "REALTIME",
+  "recv_time": "2024-11-28 12:25:01.414389"
+}
+```
+
+- New API has a full depth level message 29.14% smaller (231 bytes vs 326 bytes). It achieves this reductions through optimisation made in point 1.
+
+| Comparison                       | Old API | New API | Reduction |
+| -------------------------------- | ------- | ------- | --------- |
+| Full depth level message (bytes) | 326     | 231     | 29.14%    |
 
 3. **Structure Analysis**:
 
@@ -151,13 +195,10 @@ Is difference statistically significant? False
 Better API for latency: New API
 
 === Byte Size Comparison ===
-Entry Size Comparison:
-  Old API (Ask + Bid): 198 bytes
-  New API (Combined): 62 bytes
-  Reduction: 68.69%
-
 Full Message Size Comparison:
   Old API: 326 bytes
   New API: 231 bytes
   Reduction: 29.14%
+
+Reports saved to reports/ directory.
 ```
