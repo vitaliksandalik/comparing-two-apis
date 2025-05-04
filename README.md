@@ -51,8 +51,9 @@ However, the new API does show higher variance (std dev 37.67ms vs 13.04ms) and 
 The comparison below aims to see how many raw bytes each API needs to transmit one full depth level (ask + bid).
 So, to keep the comparison fair, the Old API example below contains two objects, while the New API example contains one (already has ask + bid in it).
 
+_Old API_
+
 ```json
-// Old API
 {
   "type": "orderbookdepth",
   "content": {
@@ -78,8 +79,9 @@ So, to keep the comparison fair, the Old API example below contains two objects,
 }
 ```
 
+_New API_
+
 ```json
-// New API
 {
   "ty": "orderbook",
   "cd": "USD-ABC",
