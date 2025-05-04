@@ -50,22 +50,27 @@ class TestAPIComparisonAnalyser(unittest.TestCase):
         os.remove(test_file)
 
     def test_run_complete_analysis_and_save_reports(self):
+        report_files = [
+            'reports/orderbook_byte_size_message_comparison.csv',
+            'reports/orderbook_byte_size_message_comparison.png',
+            'reports/orderbook_latency_comparison.csv',
+            'reports/orderbook_latency_by_message.png',
+            'reports/orderbook_latency_by_message.csv',
+            'reports/orderbook_latency_comparison.png'
+        ]
+        
+        for file in report_files:
+            if os.path.exists(file):
+                os.remove(file)
+    
+        os.makedirs('reports', exist_ok=True)
+        
         comparison_df, stats_results = self.analyser.run_complete_analysis_and_save_reports()
         self.assertIsInstance(comparison_df, pd.DataFrame)
         self.assertIsInstance(stats_results, dict)
 
-        self.assertTrue(os.path.exists(
-            'reports/orderbook_byte_size_message_comparison.csv'))
-        self.assertTrue(os.path.exists(
-            'reports/orderbook_byte_size_message_comparison.png'))
-        self.assertTrue(os.path.exists(
-            'reports/orderbook_latency_comparison.csv'))
-        self.assertTrue(os.path.exists(
-            'reports/orderbook_latency_by_message.png'))
-        self.assertTrue(os.path.exists(
-            'reports/orderbook_latency_by_message.csv'))
-        self.assertTrue(os.path.exists(
-            'reports/orderbook_latency_comparison.png'))
+        for file in report_files:
+            self.assertTrue(os.path.exists(file), f"File {file} was not created")
 
 
 if __name__ == '__main__':
