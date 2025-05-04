@@ -29,7 +29,7 @@ class OrderBookAPIAnalysis:
 
         byte_size_df = self._compare_byte_size()
         byte_size_df.to_csv(
-            'reports/orderbook_byte_size_comparison.csv', index=False)
+            'reports/orderbook_byte_size_message_comparison.csv', index=False)
         self._plot_byte_size_comparison()
 
         print("\n=== Orderbook API Comparison Results ===\n")
@@ -166,7 +166,7 @@ class OrderBookAPIAnalysis:
             'better_api': 'New API' if old_latency.mean() > new_latency.mean() else 'Old API'
         }
 
-    def export_detailed_metrics(self, file_path='reports/orderbook_detailed_metrics.csv') -> pd.DataFrame:
+    def export_detailed_metrics(self, file_path='reports/orderbook_latency_by_message.csv') -> pd.DataFrame:
         old_latency = self.old_orderbook_api_analyser.get_latency()
         new_latency = self.new_orderbook_api_analyser.get_latency()
 
@@ -212,7 +212,7 @@ class OrderBookAPIAnalysis:
         plt.savefig(save_path)
         plt.close()
 
-    def _plot_detailed_latency_bars(self, save_path='reports/orderbook_detailed_latency.png') -> None:
+    def _plot_detailed_latency_bars(self, save_path='reports/orderbook_latency_by_message.png') -> None:
         combined_df = self.export_detailed_metrics()
 
         plt.figure(figsize=(14, 8))
@@ -249,7 +249,7 @@ class OrderBookAPIAnalysis:
         plt.savefig(save_path)
         plt.close()
 
-    def _plot_byte_size_comparison(self, save_path='reports/orderbook_byte_size_comparison.png') -> None:
+    def _plot_byte_size_comparison(self, save_path='reports/orderbook_byte_size_message_comparison.png') -> None:
         plot_df = self._compare_byte_size()
 
         plt.figure(figsize=(10, 6))
@@ -280,7 +280,7 @@ class OrderBookAPIAnalysis:
 
         raw_data = byte_size_df.attrs['raw_data']
 
-        print("Full Message Size Comparison:")
+        print("Full depth level message size comparison:")
         print(f"  Old API: {raw_data.loc[0, 'Value']} bytes")
         print(f"  New API: {raw_data.loc[1, 'Value']} bytes")
         print(f"  Reduction: {raw_data.loc[2, 'Value']}")

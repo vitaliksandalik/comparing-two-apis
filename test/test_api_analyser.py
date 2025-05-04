@@ -55,15 +55,15 @@ class TestAPIComparisonAnalyser(unittest.TestCase):
         self.assertIsInstance(stats_results, dict)
 
         self.assertTrue(os.path.exists(
-            'reports/orderbook_byte_size_comparison.csv'))
+            'reports/orderbook_byte_size_message_comparison.csv'))
         self.assertTrue(os.path.exists(
-            'reports/orderbook_byte_size_comparison.png'))
+            'reports/orderbook_byte_size_message_comparison.png'))
         self.assertTrue(os.path.exists(
             'reports/orderbook_latency_comparison.csv'))
         self.assertTrue(os.path.exists(
-            'reports/orderbook_detailed_latency.png'))
+            'reports/orderbook_latency_by_message.png'))
         self.assertTrue(os.path.exists(
-            'reports/orderbook_detailed_metrics.csv'))
+            'reports/orderbook_latency_by_message.csv'))
         self.assertTrue(os.path.exists(
             'reports/orderbook_latency_comparison.png'))
 

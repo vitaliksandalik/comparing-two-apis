@@ -120,9 +120,9 @@ So, to keep the comparison fair, the Old API example below contains two objects,
 
 ![Orderbook Latency Comparison](reports/orderbook_latency_comparison.png)
 
-![Orderbook Byte Size Comparison](reports/orderbook_byte_size_comparison.png)
+![Orderbook Byte Size Comparison](reports/orderbook_byte_size_message_comparison.png)
 
-![Orderbook Detailed Latency](reports/orderbook_detailed_latency.png)
+![Orderbook Latency By Message](reports/orderbook_latency_by_message.png)
 
 ## Project Structure
 
@@ -139,11 +139,11 @@ So, to keep the comparison fair, the Old API example below contains two objects,
 │   ├── __init__.py
 │   ├── orderbook_api_samples.py
 ├── reports/
-│   ├── orderbook_byte_size_comparison.csv
-│   ├── orderbook_byte_size_comparison.png
+│   ├── orderbook_byte_size_message_comparison.csv
+│   ├── orderbook_byte_size_message_comparison.png
+│   ├── orderbook_latency_by_message.csv
+│   ├── orderbook_latency_by_message.png
 │   ├── orderbook_latency_comparison.csv
-│   ├── orderbook_detailed_latency.png
-│   ├── orderbook_detailed_metrics.csv
 │   ├── orderbook_latency_comparison.png
 ├── test/
 │   ├── __init__.py
@@ -195,7 +195,7 @@ Is difference statistically significant? False
 Better API for latency: New API
 
 === Byte Size Comparison ===
-Full Message Size Comparison:
+Full depth level message size comparison:
   Old API: 326 bytes
   New API: 231 bytes
   Reduction: 29.14%
